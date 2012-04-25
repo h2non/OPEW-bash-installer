@@ -78,12 +78,8 @@ if [ $ERROR -eq 1 ]; then
 fi
 
 # check required scripts
-if [ ! -x "$(dirname $0)/lib/custom.inc" ]; then
+if [ ! -x "$(dirname $0)/lib/base.bash" ]; then
 	echo "Error: not found $(dirname $0)/lib/custom.inc or not cannot have exec permissions. Required. Exiting."
-	exit 1
-fi
-if [ ! -x "$(dirname $0)/lib/simple.inc" ]; then
-	echo "Error: not found $(dirname $0)/lib/custom.inc or cannot have exec permissions. Required. Exiting."
 	exit 1
 fi
 
@@ -95,16 +91,34 @@ cat <<- _EOF_
 
  Author: Tomas Aparicio <tomas@rijndael-project.com>
  License: GNU GPL 3.0
- Web: <http://github.com/h2non/easyBashInstaller>
+ Code: <http://github.com/h2non/OPEW-bash-installer>
  Note: this utility was developed for the OPEW project.
  More info: <http://opew.sf.net> 
 --------------------------------------------------------
 
-Options list:
-1) Simple Wizard + Data installer
-2) Exit
+Please, follow the wizard
 
 _EOF_
+
+# define the OPEW release version
+read -p "OPEW build version: " res
+if [ -z $res ]; then
+    echo "You must enter an OPEW version. Cannot continue. "
+    exit 1
+else 
+    VERSION=$res
+fi
+
+# define the OPEW architecture
+read -p "OPEW processor architecture (x64|x86): " res
+if [ -z $res ]; then
+    _ARCH="x64"
+else 
+    _ARCH=$res
+fi
+
+# output file
+_OUTPUT="opew-$VERSION-$_ARCH.bin"
 
 read -p "Select one: " res
 case $res in
