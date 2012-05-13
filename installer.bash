@@ -5,7 +5,7 @@
 #
 # @license	GNU GPL 3.0
 # @author	Tomas Aparicio <tomas@rijndael-project.com>
-# @version	1.4 beta - 03/02/2012
+# @version	1.5 beta - 13/05/2012
 #
 # Copyright (C) 2012 - Tomas Aparicio
 #
@@ -24,16 +24,12 @@
 #
 #
 
-#
-# THIS CODE STILL BETA
-#
-
 # config variables
-VERSION="1.0.0 Beta RC6"
+VERSION="1.0.1 Beta" 
 LOG="$PWD/opew-install.log"
 FILES="$PWD/opew-files.log"
 OPEW="/opt/"
-LINES=48754
+LINES=59088
 ERROR=0
 
 # check PATH environment variable
@@ -85,7 +81,6 @@ function _welcome(){
 	echo "- Node.js"
 	echo "- Go (experimental)"
 	echo "- Lua (experimental)"
-	echo "- Tcl (experimental)"
 	echo " "
 	echo "Also is provided the following open-source database management systems:"
 	echo "- MySQL"
@@ -433,7 +428,7 @@ function _usersinstall(){
                 else
                 echo "OK: The group '$i' is available."
 		echo -n "Creating $i system group... "
-			groupadd $i >> $LOG
+			groupadd -r $i >> $LOG
 			if [ $? -eq 0 ]; then
 			 	sleep 0.5
 			 	echo "created!"
@@ -456,7 +451,7 @@ function _usersinstall(){
 
 		# postgresql user 
 		if [ $i == 'opew-postgres' ]; then
-		useradd "$i" -d /opt/opew/stack/postgresql -g "$i" -s /bin/sh -M >> $LOG
+		useradd -r "$i" -d /opt/opew/stack/postgresql -g "$i" -s /bin/sh -M >> $LOG
                 sleep 0.5
                 if [ $? -eq 0 ]; then
                         echo "created!"
@@ -469,7 +464,7 @@ function _usersinstall(){
 		else
 		# in other cases
 		#read -p "You can define a user password for security reasons. You want to do it? (y/n): " response
-		useradd "$i" -d /opt/opew/stack -g "$i" -s /bin/false -M >> $LOG 
+		useradd -r "$i" -d /opt/opew/stack -g "$i" -s /bin/false -M >> $LOG 
 		sleep 0.5
 		if [ $? -eq 0 ]; then
 			echo "created!"
@@ -535,7 +530,7 @@ function _license(){
 	echo "or contributors is licensed under the GNU GPL 3.0 public license. "
 	echo "You can read it at $OPEW/licenses"
 	echo " "
-	read  -p "You accept licenses?: (y/n) " response
+	read  -p "You accept the license terms?: (y/n) " response
 	case $response in
                 y|Y|yes|Yes|YES)
                 	echo "OK: continuning with the next installation step..."
@@ -687,6 +682,9 @@ function _postinstall(){
         echo " "
         sleep 2
         fi
+
+	# remove files
+	rm -f $FILES
 	sleep 1
 
 	echo " "
@@ -740,7 +738,7 @@ function _postinstall(){
 		echo "If you wanna use the OPEW environment variables, simply run:"
 		echo "/opt/opew/scripts/env"
 		echo " "
-		echo "See README at '$OPEWopew/' for more information and getting started." 
+		echo "See /opt/opew/README.md for more information and getting started." 
 		echo " "
 
         echo "Thanks for try to use OPEW. Enjoy it!"
