@@ -5,7 +5,7 @@
 #
 # @license	GNU GPL 3.0
 # @author	Tomas Aparicio <tomas@rijndael-project.com>
-# @version	1.5 beta - 13/05/2012
+# @version	1.5 beta - 26/05/2012
 #
 # Copyright (C) 2012 - Tomas Aparicio
 #
@@ -648,6 +648,14 @@ function _postinstall(){
 	chown -R opew-httpd:opew-httpd /opt/opew/stack/apache2/htdocs >> $LOG
 	chown -R opew-httpd:opew-httpd /opt/opew/stack/apache2/logs/fastcgi >> $LOG
 	chown -R opew-httpd:opew-httpd /opt/opew/stack/php/tmp >> $LOG
+	# nginx
+        chown -R opew-httpd:opew-httpd /opt/opew/stack/nginx/tmp >> $LOG
+        chown -R opew-httpd:opew-httpd /opt/opew/stack/nginx/proxy_temp >> $LOG
+        chown -R opew-httpd:opew-httpd /opt/opew/stack/nginx/scgi_temp >> $LOG
+        chown -R opew-httpd:opew-httpd /opt/opew/stack/nginx/uwsgi_temp >> $LOG
+        chown -R opew-httpd:opew-httpd /opt/opew/stack/nginx/logs >> $LOG
+        # memcached using opew user
+        chown -R opew:opew /opt/opew/stack/memcached/tmp >> $LOG
 	if [ $? -eq 0 ]; then
 	echo "Assigned permisssion to opew-httpd user and group..."
 	else
