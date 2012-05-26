@@ -25,14 +25,14 @@
 #
 
 # config variables
-VERSION="1.0.1 Beta" 
-LOG="$PWD/opew-install.log"
-FILES="$PWD/opew-files.log"
-OPEW="/opt/"
-LINES=59088
-ERROR=0
+VERSION="1.0.2 Beta" # current OPEW version
+LOG="$PWD/opew-install.log" # output log of the installer script
+FILES="$PWD/opew-files.log" # output log of files
+OPEW="/opt/" # default installation path
+LINES=59671 # number of files
+ERROR=0 #default with no errors
 
-# check PATH environment variable
+# check a valid PATH environment variable
 if [ -z $PATH ]; then
 	echo "The PATH environment variable is empty. Cannot continue with the installation process..."
 	echo "Must be defined in order to run the installer properly. "
@@ -95,7 +95,7 @@ function _welcome(){
 	echo "This installer will check and prepare the system properly before install"
 	echo " "
 	echo "* You can review the code behind this script installer simply typing: "
-	echo '$ vi '$0' | head -n 756'
+	echo '$ vi '$0' | head -n 761'
 	echo "Or via web from the public Git repository: "
 	echo "https://raw.github.com/h2non/OPEW/master/extra/installer/main.sh "
 	echo " "
@@ -734,11 +734,13 @@ function _postinstall(){
 		echo "List of available services: "
 		echo " "
 		echo "apache - Apache HTTP Server"
+		echo "nginx - Nginx HTTP Server"
 		echo "mysql - MySQL Server"
 		echo "postgresql - PostgreSQL Server"
 		echo "mondodb - MongoDB Server"
 		echo "git - Git Server daemon"
-		echo "redis- Redis Server"
+		echo "redis - Redis Server"
+		echo "memcached - Memcached server"
 		echo " "
 		echo "Also you get the help message typing:"
 		echo "/opt/opew/stack/opew help"
