@@ -6,6 +6,15 @@ OPEW is a powerful, complete, independent and extensible open source distributio
 Its goal is to provides a rich portable ready-to-run development environment focused on modern and robust programming languages in oder to satisfy the common needs for the web development
 This is a subproject of OPEW. More info about the OPEW project at <http://opew.sf.net>.
 
+## Usage
+
+```bash
+# chmod +x build.bash
+# ./build.bash
+```
+
+See inc/ for sample scripts
+
 ## Author
 
 Tomas Aparicio `tomas@rijndael-project.com`

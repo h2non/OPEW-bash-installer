@@ -55,13 +55,6 @@ if [ -z $PATH ]; then
 	exit 1
 fi
 
-# required run like root user
-if [ "`id -u`" -ne 0 ];	then
-       	echo "ERROR: "
-	echo "You must run like a root user. You can't continue..."
-       	exit 1
-fi
-
 ERROR=0
 # check OS binary tools required by the installer builder
 for i in $(echo "source;dirname;declare;type;read;awk;head;tail;wc;tar;df;cat" | tr ";" "\n")
@@ -75,7 +68,7 @@ do
 		ERROR=1
 	fi
 done
-if [ $ERROR -eq 0 ]; then
+if [ $ERROR -eq 1 ]; then
 	echo "Cannot continue. Exiting."
 	exit 1
 fi
@@ -83,7 +76,7 @@ fi
 # config variables
 LOCATION=$(dirname $0)
 TMPDIR="$LOCATION/tmp" # temporal output directory
-PKGDIR="$LOCATION/tmp" # packages output directory
+PKGDIR="$LOCATION/pkg" # packages output directory
 INCDIR="$LOCATION/inc" # includes source directory
 LOGDIR="$LOCATION/log" # log output dir
 VERSION="1.0 Beta"
@@ -149,6 +142,8 @@ fi
 read -p "Enter the processor architecture (amd64|x86): " res
 if [ -z $res ]; then
     _ARCH="amd64"
+    echo "Default to 'amd64'"
+    echo " "
 else 
     _ARCH=$res
 fi
@@ -161,7 +156,6 @@ cat <<- _EOF_
 Now you must enter the header file and bash base installer script.
 The builder provides five variables that you must use in your custom bash installer.
 See inc/installer.inc for a real example of a complete installer. 
-
 _EOF_
 
 echo " "
@@ -212,9 +206,22 @@ while : ; do
     fi 
 done 
 
+echo " "
+read -p "Do you want to generate the installer? (y|n): " res
+case $res in
+y|Y|yes|YES|Yes) 
+    # continue
+;;
+*)
+    echo "You enter '$res'. Exiting."
+    exit 0
+;;
+esac
+
 sleep 1
 
-echo "Generating the file package... this may take some minutes"
+echo " "
+echo "Generating the file package. This may take some minutes..."
 tar czvf "$TMPDIR/$_OUTPUT.tar.gz" $_FILE_FOLDER > "$LOGDIR/compress-files.log"
 
 # takes the lines
@@ -229,17 +236,22 @@ echo "Generating the installer..."
 echo '#!/bin/bash' > "$TMPDIR/$OUTPUT"
 getfile $_FILE_HEADER >> "$TMPDIR/$OUTPUT"
 
-cat <<- _EOF_
+# set config variables
+echo '# config variables' >> "$TMPDIR/$OUTPUT"
+echo "VERSION=$_VERSION # current OPEW version" >> "$TMPDIR/$OUTPUT"
+echo "LOG='$_NAME-install.log' # output log of the installer script" >> "$TMPDIR/$OUTPUT"
+echo "FILES='$_NAME-files.log' # output log of files" >> "$TMPDIR/$OUTPUT"
+echo "OUTPUT=/opt/ # default installation path" >> "$TMPDIR/$OUTPUT"
+echo "LINES=$_LINES # number of files" >> "$TMPDIR/$OUTPUT"
+echo "ERROR=0 # default with no errors" >> "$TMPDIR/$OUTPUT"
+# replace the config
+#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{LINES}/$_LINES/g" >> "$TMPDIR/$OUTPUT"
+#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{VERSION}/$_VERSION/g" >> "$TMPDIR/$OUTPUT"
+#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{NAME}/$_NAME/g" >> "$TMPDIR/$OUTPUT"
+#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{NAME}/$_NAME/g" >> "$TMPDIR/$OUTPUT"
 
-# config variables
-VERSION=$_VERSION # current OPEW version
-LOG="$_NAME-install.log" # output log of the installer script
-FILES="$_NAME-files.log" # output log of files
-OUTPUT=/opt/ # default installation path
-LINES=$_LINES # number of files
-ERROR=0 # default with no errors
-
-_EOF_ >> "$TMPDIR/$OUTPUT"
+# get the installer
+getfile $_FILE_INSTALLER >> "$TMPDIR/$OUTPUT"
 
 echo "Packing the installer ($_OUTPUT.bin)"
 # merge to .bin
