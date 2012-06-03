@@ -5,7 +5,7 @@
 #
 # @license	GNU GPL 3.0
 # @author	Tomas Aparicio <tomas@rijndael-project.com>
-# @version	2.2 beta - revision 17/04/2012
+# @version	2.3 beta - revision 03/06/2012
 # 
 # Copyright (C) 2012 - Tomas Aparicio
 #
@@ -24,13 +24,6 @@
 #
 #
 
-# static variables
-TMPDIR=tmp/ # temporal output directory
-PKGDIR=pkg/ # packages output directory
-VERSION="2.2 Beta" # version 
-LOGOUT=build.out.log
-ERROR=0
-
 #
 # base functions
 #
@@ -42,6 +35,15 @@ ERROR=0
 function _check 
 {
     type "$1" &> /dev/null ;
+}
+
+#
+# get the file via cat 
+# @param {String} File path 
+#
+function getfile
+{
+    cat $1
 }
 
 # check PATH environment variable
@@ -60,8 +62,9 @@ if [ "`id -u`" -ne 0 ];	then
        	exit 1
 fi
 
+ERROR=0
 # check OS binary tools required by the installer builder
-for i in $(echo "source;dirname;type;read;awk;head;tail;wc;tar;df" | tr ";" "\n")
+for i in $(echo "source;dirname;declare;type;read;awk;head;tail;wc;tar;df;cat" | tr ";" "\n")
 do
 	if ! _check $i ; then
 		echo " "
@@ -72,23 +75,44 @@ do
 		ERROR=1
 	fi
 done
-if [ $ERROR -eq 1 ]; then
+if [ $ERROR -eq 0 ]; then
 	echo "Cannot continue. Exiting."
 	exit 1
 fi
 
-# check required scripts
-if [ ! -x "$(dirname $0)/lib/base.bash" ]; then
-	echo "Error: not found $(dirname $0)/lib/custom.inc or not cannot have exec permissions. Required. Exiting."
-	exit 1
+# config variables
+LOCATION=$(dirname $0)
+TMPDIR="$LOCATION/tmp" # temporal output directory
+PKGDIR="$LOCATION/tmp" # packages output directory
+INCDIR="$LOCATION/inc" # includes source directory
+LOGDIR="$LOCATION/log" # log output dir
+VERSION="1.0 Beta"
+OUTPUT=installer.bash
+
+# check bash install folders
+if [ ! -d  $TMPDIR ]; then
+    echo "Error: $TMPDIR folder don't exists. Cannot continue."
 fi
+if [ ! -d  $LOGDIR ]; then
+    echo "Error: $LOGDIR folder don't exists. Cannot continue."
+fi
+if [ ! -d  $PKGDIR ]; then
+    echo "Error: $PKGDIR folder don't exists. Cannot continue."
+fi
+if [ ! -d  $INCDIR ]; then
+    echo "Error: $INCDIR folder don't exists. Cannot continue."
+fi
+
+# change dir
+cd $LOCATION > /dev/null
 
 # output header info
 cat <<- _EOF_
 --------------------------------------------------------
- OPEW Bash Installer ($VERSION)
+ OPEW Bash-based installer builder utility ($VERSION)
  A simple UNIX bash-based installer builder utility
 
+ Version: $VERSION
  Author: Tomas Aparicio <tomas@rijndael-project.com>
  License: GNU GPL 3.0
  Code: <http://github.com/h2non/OPEW-bash-installer>
@@ -96,41 +120,133 @@ cat <<- _EOF_
  More info: <http://opew.sf.net> 
 --------------------------------------------------------
 
-Please, follow the wizard
+Please, follow the wizard in order to build a new installer
 
 _EOF_
 
-# define the OPEW release version
-read -p "OPEW build version: " res
+
+# define the software name package (default opew)
+read -p "Release package name (e.g. opew): " res
 if [ -z $res ]; then
-    echo "You must enter an OPEW version. Cannot continue. "
-    exit 1
+    _NAME=opew
+    echo "Default to 'opew'"
+    echo " "
 else 
-    VERSION=$res
+    _NAME=$res
 fi
 
-# define the OPEW architecture
-read -p "OPEW processor architecture (x64|x86): " res
+# define the OPEW release version
+read -p "Enter the release version (e.g. 1.1.0): " res
 if [ -z $res ]; then
-    _ARCH="x64"
+    echo "You must enter a version. Cannot continue. "
+    exit 1
+else 
+    # define the version
+    _VERSION=$res
+fi
+
+# define the software processor architecture (default to amd64)
+read -p "Enter the processor architecture (amd64|x86): " res
+if [ -z $res ]; then
+    _ARCH="amd64"
 else 
     _ARCH=$res
 fi
 
 # output file
-_OUTPUT="opew-$VERSION-$_ARCH.bin"
+_OUTPUT="$_NAME-$_VERSION-$_ARCH"
 
-read -p "Select one: " res
-case $res in
-	1)
-	 source $(dirname $0)/inc/simple.inc
-	;;
-	4)
-	 echo "Exiting."
-	 exit 0
-	;;
-	*) 
-	 echo "Invalid option. Exiting."
-	 exit 1
-	;;
-esac
+cat <<- _EOF_
+
+Now you must enter the header file and bash base installer script.
+The builder provides five variables that you must use in your custom bash installer.
+See inc/installer.inc for a real example of a complete installer. 
+
+_EOF_
+
+echo " "
+echo "Header file with custom copyright and licensing info (see $LOCATION/inc/header.inc) "
+while : ; do
+    read -p "Enter the path of the file: " res
+    if [ $res == "exit" ]; then 
+        exit 0
+    fi
+    if [ -z $res ] || [ ! -f "$res" ]; then
+        echo "Invalid path. Enter a new file path... (enter CTRL+C or 'exit' for exit)"
+        echo " "
+    else 
+        _FILE_HEADER=$res
+        break
+    fi 
+done 
+
+echo " "
+echo "Installer main script (see $LOCATION/inc/installer.inc) "
+while : ; do
+    read -p "Enter the path of the file: " res
+    if [ $res == "exit" ]; then 
+        exit 0
+    fi
+    if [ -z $res ] || [ ! -f "$res" ]; then
+        echo "Invalid path. Enter a new file path... (enter CTRL+C or 'exit' for exit)"
+        echo " "
+    else 
+        _FILE_INSTALLER=$res
+        break
+    fi 
+done 
+
+echo " "
+echo "Software folder (e.g. /opt/opew) "
+while : ; do
+    read -p "Enter the software folder: " res
+    if [ $res == "exit" ]; then 
+        exit 0
+    fi
+    if [ -z $res ] || [ ! -d "$res" ]; then
+        echo "Invalid folder. Enter a valid folder path... (enter CTRL+C or 'exit' for exit)"
+        echo " "
+    else 
+        _FILE_FOLDER=$res
+        break
+    fi 
+done 
+
+sleep 1
+
+echo "Generating the file package... this may take some minutes"
+tar czvf "$TMPDIR/$_OUTPUT.tar.gz" $_FILE_FOLDER > "$LOGDIR/compress-files.log"
+
+# takes the lines
+_LINES=`wc -l "$LOGDIR/compress-files.log" | awk '{ print $1; }'`
+echo "Done! Added $_LINES files."
+
+sleep 1
+
+echo "Generating the installer..."
+
+# generating the installer
+echo '#!/bin/bash' > "$TMPDIR/$OUTPUT"
+getfile $_FILE_HEADER >> "$TMPDIR/$OUTPUT"
+
+cat <<- _EOF_
+
+# config variables
+VERSION=$_VERSION # current OPEW version
+LOG="$_NAME-install.log" # output log of the installer script
+FILES="$_NAME-files.log" # output log of files
+OUTPUT=/opt/ # default installation path
+LINES=$_LINES # number of files
+ERROR=0 # default with no errors
+
+_EOF_ >> "$TMPDIR/$OUTPUT"
+
+echo "Packing the installer ($_OUTPUT.bin)"
+# merge to .bin
+cat "$TMPDIR/$OUTPUT" "$TMPDIR/$_OUTPUT.tar.gz" > "$PKGDIR/$_OUTPUT.bin"
+
+echo "Cleaning temporal file..."
+rm -f "$TMPDIR/$_OUTPUT.tar.gz"
+
+echo "Finished. New release generated: "
+echo "$PKGDIR/$_OUTPUT.bin"

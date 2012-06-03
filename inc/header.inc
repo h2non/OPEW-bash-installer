@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # OPEW auto-installer bash script
 # This is a part of the OPEW project <http://opew.sourceforge.net>

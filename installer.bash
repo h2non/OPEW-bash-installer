@@ -30,82 +30,91 @@ LOG="$PWD/opew-install.log" # output log of the installer script
 FILES="$PWD/opew-files.log" # output log of files
 OPEW="/opt/" # default installation path
 LINES=59671 # number of files
-ERROR=0 #default with no errors
+ERROR=0 # default with no errors
 
 # check a valid PATH environment variable
 if [ -z $PATH ]; then
-	echo "The PATH environment variable is empty. Cannot continue with the installation process..."
-	echo "Must be defined in order to run the installer properly. "
-	echo "Please, copy and ejecute this (or your customized PATH environment): " 
-	echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-	exit 1
+    echo "The PATH environment variable is empty. Cannot continue with the installation process..."
+    echo "Must be defined in order to run the installer properly. "
+    echo "Please, copy and ejecute this (or your customized PATH environment): " 
+    echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    exit 1
 fi
 
 # clear old installation log files
 function _debuglog(){
-	if [ -s $LOG ]; then
-		rm -f $LOG
-		touch $LOG
-	fi
-	if [ -s $FILES ]; then
-		rm -f $FILES
-		touch $FILES
-	fi 
+    if [ -s $LOG ]; then
+        rm -f $LOG
+        touch $LOG
+    fi
+    if [ -s $FILES ]; then
+        rm -f $FILES
+        touch $FILES
+    fi 
 }
 
 function _welcome(){
 	clear
 	_debuglog
-	echo "##############################################"
-	echo "     OPEW - Open Web Development Stack " 
-	echo "##############################################"
-	echo " "
-	echo "Version: $VERSION"
-	echo " "
-	echo "NOTICE: "
-	echo "This is a beta public release candidate just for testing and experimental proposals and some packages maybe expected to be broken."
-	echo "If you like OPEW, feel free to give me some feedback via <tomas@rijndael-project.com>. "
-	echo " "
-	read -p "Press enter to continue..."
-	clear
-	echo " "
-	echo "OPEW is a complete, independent and extensible open distribution stack for GNU/Linux based OS."
-        echo "Its goal is to provides a powerful and portable ready-to-run development environment focused on modern and robust (mainly web) programming languages. "
-        echo "You can read more at the project page: <http://opew.sourceforge.net>"
-	echo " "
-	echo "Using OPEW you can deploy natively with the following open-source programming languages:"
-	echo "- PHP "
-	echo "- Perl "
-	echo "- Python (experimental)"
-	echo "- Ruby (experimental)"
-	echo "- Node.js"
-	echo "- Go (experimental)"
-	echo "- Lua (experimental)"
-	echo " "
-	echo "Also is provided the following open-source database management systems:"
-	echo "- MySQL"
-	echo "- PostgreSQL"
-	echo "- SQLite3"
-	echo "- MongoDB"
-	echo "- Redis"
-	echo " "
-	read -p "Press enter to continue..."
-	echo " "
-	echo "This script will install OPEW in this system ("`hostname`")" 
-	echo "This installer will check and prepare the system properly before install"
-	echo " "
-	echo "* You can review the code behind this script installer simply typing: "
-	echo '$ vi '$0' | head -n 761'
-	echo "Or via web from the public Git repository: "
-	echo "https://raw.github.com/h2non/OPEW/master/extra/installer/main.sh "
-	echo " "
-	echo "* Also, if you experiment any issue during the installation, please report it here:"
-	echo "http://github.com/h2non/opew/issues"
-	echo " "
-	echo "This installer will generate the following both log files: "
-	echo "$LOG > Output commands log from the installation process"
-	echo "$FILES > Installed files extraction log"
-	echo " "
+	
+cat <<- _EOF_
+##############################################
+     OPEW - Open Web Development Stack  
+##############################################
+	 
+Version: $VERSION
+	 
+NOTICE: 
+This is a beta public release candidate just for testing and experimental proposals and some packages maybe expected to be broken.
+If you like OPEW, feel free to give me some feedback via <tomas@rijndael-project.com>. 
+
+_EOF_
+
+    read -p "Press enter to continue..."
+    clear
+
+    cat <<- _EOF_ 
+OPEW is a complete, independent and extensible open distribution stack for GNU/Linux based OS.
+Its goal is to provides a powerful and portable ready-to-run development environment focused on modern and robust (mainly web) programming languages. 
+You can read more at the project page: <http://opew.sourceforge.net>
+ 
+Using OPEW you can deploy natively with the following open-source programming languages:
+- PHP 
+- Perl 
+- Python (experimental)
+- Ruby (experimental)
+- Node.js
+- Go (experimental)
+- Lua (experimental)
+ 
+Also is provided the following open-source database management systems:
+- MySQL
+- PostgreSQL
+- SQLite3
+- MongoDB
+- Redis
+
+_EOF_
+
+    read -p "Press enter to continue..."
+
+    cat <<- _EOF_ 
+
+This script will install OPEW in this system (`hostname`) 
+This installer will check and prepare the system properly before install
+ 
+* You can review the code behind this installer script via the public Git repository: 
+https://raw.github.com/h2non/OPEW/master/extra/installer/main.sh 
+ 
+* Also, if you experiment any issue during the installation, please report it here:
+https://github.com/h2non/OPEW-bash-installer/issues
+ 
+This installer will generate the following both log files: 
+$LOG > Output commands log from the installation process
+$FILES > Installed files extraction log
+
+_EOF_
+
 }
 
 function _die(){
@@ -159,7 +168,7 @@ function _testenv(){
 	fi
 
 	# verify bin tools for used by the installer script
-	for i in $(echo "awk;head;tail;wc;tar;df" | tr ";" "\n")
+	for i in $(echo "source;dirname;declare;type;read;awk;head;tail;wc;tar;df;cat" | tr ";" "\n")
 	do
 		if ! _cexists $i ; then
 			echo " "
@@ -225,7 +234,7 @@ function _testenv(){
                 echo " "
                 read -p "Do you want automatically remove the symbolic link to the old OPEW installation? (just the symbolic link): (Y/n) " response
                 if [ -z $response ]; then response=y; fi
-		if [ $response = "y" ] && [ $response = "Y"]; then
+		if [ $response = "y" ] || [ $response = "Y"]; then
                         if test `rm -f "/opt/opew"` -eq 1 ; then
                                 _die "Cannot remove the symbolic link to the old OPEW installation path. Can't continue... "
                         else
@@ -262,7 +271,7 @@ function _testenv(){
 		if [ $response = "y" ] || [ $response = "Y"]; then
 			while : ; do
                         read -p "Please, enter the new location to move the old OPEW installation: " response
-	                if [ -z $respone ] && [ -d $response ]; then
+	                if [ -z $respone ] || [ -d $response ]; then
                                 echo "Invalid path or the directory already exists. Enter a new valid path... (CTRL+C to exit): "
                                 echo " "
                         else
@@ -378,11 +387,11 @@ function _preinstall(){
 		y|Y|yes|Yes|YES)
 		while : ; do
 			read -p "Please, enter the absolute path (/home or /usr): " newpath
-			if [ -z "$newpath/opew" ] && [ -d "$newpath/opew" ]; then
+			if [ -z $newpath ] || [ -d "$newpath/opew" ]; then
 				echo "Invalid path o the directory already exists. Enter a new path... (CTRL+C to exit from the installer)"
                                	echo " "
 			else 
-				OPEW=$newpath"/"
+				OPEW="$newpath/"
 				# check free avaiable space
 				_checkspace $PARTITION
 
