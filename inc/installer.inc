@@ -71,15 +71,11 @@ This script will install OPEW in this system (`hostname`)
 This installer will check and prepare the system properly before install
  
 * You can review the code behind this installer script via the public Git repository: 
-https://raw.github.com/h2non/OPEW/master/extra/installer/main.sh 
+https://github.com/h2non/OPEW-bash-installer/blob/master/inc/installer.inc
  
 * Also, if you experiment any issue during the installation, please report it here:
 https://github.com/h2non/OPEW-bash-installer/issues
  
-This installer will generate the following both log files: 
-$LOG > Output commands log from the installation process
-$FILES > Installed files extraction log
-
 _EOF_
 
 }
