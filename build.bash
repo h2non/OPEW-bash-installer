@@ -102,8 +102,7 @@ cd $LOCATION > /dev/null
 # output header info
 cat <<- _EOF_
 --------------------------------------------------------
- OPEW Bash-based installer builder utility ($VERSION)
- A simple UNIX bash-based installer builder utility
+ OPEW Bash-based installer builder utility
 
  Version: $VERSION
  Author: Tomas Aparicio <tomas@rijndael-project.com>
@@ -162,13 +161,13 @@ echo " "
 echo "Header file with custom copyright and licensing info (see $LOCATION/inc/header.inc) "
 while : ; do
     read -p "Enter the path of the file: " res
-    if [ $res == "exit" ]; then 
-        exit 0
-    fi
     if [ -z $res ] || [ ! -f "$res" ]; then
         echo "Invalid path. Enter a new file path... (enter CTRL+C or 'exit' for exit)"
         echo " "
     else 
+        if [ $res == "exit" ]; then 
+            exit 0
+        fi
         _FILE_HEADER=$res
         break
     fi 
@@ -178,29 +177,29 @@ echo " "
 echo "Installer main script (see $LOCATION/inc/installer.inc) "
 while : ; do
     read -p "Enter the path of the file: " res
-    if [ $res == "exit" ]; then 
-        exit 0
-    fi
     if [ -z $res ] || [ ! -f "$res" ]; then
         echo "Invalid path. Enter a new file path... (enter CTRL+C or 'exit' for exit)"
         echo " "
     else 
+        if [ $res == "exit" ]; then 
+            exit 0
+        fi
         _FILE_INSTALLER=$res
         break
     fi 
 done 
 
 echo " "
-echo "Software folder (e.g. /opt/opew) "
+echo "Software files folder (e.g. /opt/opew) "
 while : ; do
     read -p "Enter the software folder: " res
-    if [ $res == "exit" ]; then 
-        exit 0
-    fi
     if [ -z $res ] || [ ! -d "$res" ]; then
         echo "Invalid folder. Enter a valid folder path... (enter CTRL+C or 'exit' for exit)"
         echo " "
     else 
+        if [ $res == "exit" ]; then 
+            exit 0
+        fi
         _FILE_FOLDER=$res
         break
     fi 
@@ -238,12 +237,13 @@ getfile $_FILE_HEADER >> "$TMPDIR/$OUTPUT"
 
 # set config variables
 echo '# config variables' >> "$TMPDIR/$OUTPUT"
-echo "VERSION=$_VERSION # current OPEW version" >> "$TMPDIR/$OUTPUT"
+echo "VERSION='$_VERSION' # current OPEW version" >> "$TMPDIR/$OUTPUT"
 echo "LOG='$_NAME-install.log' # output log of the installer script" >> "$TMPDIR/$OUTPUT"
 echo "FILES='$_NAME-files.log' # output log of files" >> "$TMPDIR/$OUTPUT"
-echo "OUTPUT=/opt/ # default installation path" >> "$TMPDIR/$OUTPUT"
+echo "OUTPUT='/opt/' # default installation path" >> "$TMPDIR/$OUTPUT"
 echo "LINES=$_LINES # number of files" >> "$TMPDIR/$OUTPUT"
 echo "ERROR=0 # default with no errors" >> "$TMPDIR/$OUTPUT"
+
 # replace the config
 #getfile "$TMPDIR/$OUTPUT" | sed -e "s/{LINES}/$_LINES/g" >> "$TMPDIR/$OUTPUT"
 #getfile "$TMPDIR/$OUTPUT" | sed -e "s/{VERSION}/$_VERSION/g" >> "$TMPDIR/$OUTPUT"
@@ -260,5 +260,6 @@ cat "$TMPDIR/$OUTPUT" "$TMPDIR/$_OUTPUT.tar.gz" > "$PKGDIR/$_OUTPUT.bin"
 echo "Cleaning temporal file..."
 rm -f "$TMPDIR/$_OUTPUT.tar.gz"
 
+echo " "
 echo "Finished. New release generated: "
 echo "$PKGDIR/$_OUTPUT.bin"

@@ -94,7 +94,7 @@ function _requirements(){
 	echo " "
 	echo "* x64 based (64 bits) compatible processor"
 	echo "* Minimum of 256 MB of RAM"
-	echo "* Minimum of 512 MB of hard disk free space (so 1GB is recommended)"
+	echo "* Minimum of 768 MB of hard disk free space (so 1GB is recommended)"
 	echo "* At once a mininal GNU/Linux (64 bits) based OS"
 	echo "* TCP/IP protocol support" 
 	echo "* Root access level"
