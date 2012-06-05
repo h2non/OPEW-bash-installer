@@ -84,17 +84,21 @@ DATE=`date +%d/%m/%Y`
 OUTPUT=installer.bash
 
 # check bash install folders
-if [ ! -d  $TMPDIR ]; then
+if [ ! -d $TMPDIR ]; then
     echo "Error: $TMPDIR folder don't exists. Cannot continue."
+    exit
 fi
-if [ ! -d  $LOGDIR ]; then
+if [ ! -d $LOGDIR ]; then
     echo "Error: $LOGDIR folder don't exists. Cannot continue."
+    exit
 fi
-if [ ! -d  $PKGDIR ]; then
+if [ ! -d $PKGDIR ]; then
     echo "Error: $PKGDIR folder don't exists. Cannot continue."
+    exit
 fi
-if [ ! -d  $INCDIR ]; then
+if [ ! -d $INCDIR ]; then
     echo "Error: $INCDIR folder don't exists. Cannot continue."
+    exit
 fi
 
 # change dir
@@ -199,6 +203,7 @@ while : ; do
         _FILE_SEPARATOR=$res
         echo "Using '###DATA###' by default"
         echo " "
+        break
     else 
         if [ $res == "exit" ]; then 
             exit 0
@@ -240,7 +245,7 @@ sleep 1
 
 echo " "
 echo "Generating the file package. This may take some minutes..."
-tar czvf "$TMPDIR/$_OUTPUT.tar.gz" $_FILE_FOLDER > "$LOGDIR/$_NAME-compress-files.log"
+tar czvf "$TMPDIR/$_OUTPUT.tar.gz" "$_FILE_FOLDER" > "$LOGDIR/$_NAME-compress-files.log"
 
 # takes the lines
 _LINES=`wc -l "$LOGDIR/$_NAME-compress-files.log" | awk '{ print $1; }'`
