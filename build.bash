@@ -81,8 +81,8 @@ PKGDIR="$LOCATION/pkg" # packages output directory
 INCDIR="$LOCATION/inc" # includes source directory
 LOGDIR="$LOCATION/log" # log output dir
 VERSION="1.0 Beta"
-DATE=`date +%d/%m/%Y`
-OUTPUT=installer.bash
+DATE=`date +%d-%m-%Y`
+OUTPUT=installer.out.bash
 
 # check bash install folders
 if [ ! -d $TMPDIR ]; then
@@ -263,11 +263,12 @@ echo '#!/bin/bash' > "$TMPDIR/$OUTPUT"
 getfile $_FILE_HEADER >> "$TMPDIR/$OUTPUT"
 
 # set config variables
-echo '# config variables' >> "$TMPDIR/$OUTPUT"
 echo '#'  >> "$TMPDIR/$OUTPUT"
-echo "# Generated the $DATE with OPEW Bash installer builder utility $VERSION"  >> "$TMPDIR/$OUTPUT"
+echo "# Generated $DATE with OPEW Bash installer builder utility $VERSION"  >> "$TMPDIR/$OUTPUT"
 echo "# More info: https://github.com/h2non/OPEW-bash-installer"  >> "$TMPDIR/$OUTPUT"
 echo '#'  >> "$TMPDIR/$OUTPUT"
+echo '# config variables' >> "$TMPDIR/$OUTPUT"
+
 echo "VERSION='$_VERSION'" >> "$TMPDIR/$OUTPUT"
 echo "LOG='$_NAME-install.log'" >> "$TMPDIR/$OUTPUT"
 echo "FILES='$_NAME-files.log'" >> "$TMPDIR/$OUTPUT"
@@ -281,7 +282,7 @@ getfile $_FILE_INSTALLER >> "$TMPDIR/$OUTPUT"
 echo $_FILE_SEPARATOR >> "$TMPDIR/$OUTPUT"
 
 echo "Packing the installer ($_OUTPUT.bin)"
-# merge to .bin
+# finally merge to .bin
 cat "$TMPDIR/$OUTPUT" "$TMPDIR/$_OUTPUT.tar.gz" > "$PKGDIR/$_OUTPUT.bin"
 
 echo "Cleaning temporal file..."
