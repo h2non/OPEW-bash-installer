@@ -9,7 +9,8 @@ if [ -z $PATH ]; then
 fi
 
 # clear old installation log files
-function _debuglog {
+function _debuglog 
+{
     if [ -f $LOG ]; then
         rm -f $LOG
         touch $LOG
@@ -20,7 +21,8 @@ function _debuglog {
     fi 
 }
 
-function _welcome {
+function _welcome 
+{
 	clear
 	_debuglog
 	

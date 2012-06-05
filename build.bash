@@ -38,35 +38,36 @@ function _check
 }
 
 #
-# get the file via cat 
+# get a file via cat 
 # @param {String} File path 
+# @return {String} File contents
 #
-function getfile
+function getfile 
 {
     cat $1
 }
 
 # check PATH environment variable
 if [ -z $PATH ]; then
-	echo "The PATH environment variable is empty."
-	echo "Must be defined in order to run this script properly. "
-	echo "Please, copy and ejecute this (or your customized PATH environment): " 
-	echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-	exit 1
+    echo "The PATH environment variable is empty."
+    echo "Must be defined in order to run this script properly. "
+    echo "Please, copy and ejecute this (or your customized PATH environment): " 
+    echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    exit 1
 fi
 
 ERROR=0
 # check OS binary tools required by the installer builder
 for i in $(echo "source;dirname;declare;type;read;awk;head;tail;wc;tar;df;cat" | tr ";" "\n")
 do
-	if ! _check $i ; then
-		echo " "
-		echo "Error:"
-		echo "The binary tool '$i' not found in the system (looking using PATH env variable)"
-		echo "Check it or install '$i' via your package manager and try again with the installation"
-		echo " "
-		ERROR=1
-	fi
+    if ! _check $i ; then
+        echo " "
+        echo "Error:"
+        echo "The binary tool '$i' not found in the system (looking using PATH env variable)"
+        echo "Check it or install '$i' via your package manager and try again with the installation"
+        echo " "
+        ERROR=1
+    fi
 done
 if [ $ERROR -eq 1 ]; then
 	echo "Cannot continue. Exiting."
@@ -158,7 +159,7 @@ _OUTPUT="$_NAME-$_VERSION-$_ARCH"
 cat <<- _EOF_
 
 Now you must enter the header file and bash base installer script.
-The builder provides five variables that you must use in your custom bash installer.
+The builder provides five config variables to your custom installer script.
 See inc/installer.inc for a real example of a complete installer. 
 _EOF_
 
@@ -273,6 +274,7 @@ echo "FILES='$_NAME-files.log'" >> "$TMPDIR/$OUTPUT"
 echo "OUTPUT='/opt/'" >> "$TMPDIR/$OUTPUT"
 echo "LINES=$_LINES" >> "$TMPDIR/$OUTPUT"
 echo "ERROR=0" >> "$TMPDIR/$OUTPUT"
+
 # get the installer
 getfile $_FILE_INSTALLER >> "$TMPDIR/$OUTPUT"
 # finally add the data separator string
