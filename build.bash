@@ -243,12 +243,14 @@ echo "Generating the file package. This may take some minutes..."
 tar czvf "$TMPDIR/$_OUTPUT.tar.gz" $_FILE_FOLDER > "$LOGDIR/$_NAME-compress-files.log"
 
 # takes the lines
-_LINES=`wc -l "$LOGDIR/compress-files.log" | awk '{ print $1; }'`
+_LINES=`wc -l "$LOGDIR/$_NAME-compress-files.log" | awk '{ print $1; }'`
 echo "Done! Added $_LINES files."
 
 sleep 1
 
 echo "Generating the installer..."
+
+OUTPUT="$_NAME-$OUTPUT"
 
 # generating the installer
 echo '#!/bin/bash' > "$TMPDIR/$OUTPUT"
