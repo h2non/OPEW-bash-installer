@@ -23,12 +23,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ## config variables
-VERSION='1.0.2' # current OPEW version
-LOG='opew-install.log' # output log of the installer script
-FILES='opew-files.log' # output log of files
-OUTPUT='/opt/' # default installation path
-LINES=56989 # number of files
-ERROR=0 # default with no errors
+VERSION='1.2.3'
+LOG='opew-install.log'
+FILES='opew-files.log'
+OUTPUT='/opt/'
+LINES=56989
+ERROR=0
 
 # check a valid PATH environment variable
 if [ -z $PATH ]; then
@@ -40,7 +40,7 @@ if [ -z $PATH ]; then
 fi
 
 # clear old installation log files
-function _debuglog(){
+function _debuglog {
     if [ -f $LOG ]; then
         rm -f $LOG
         touch $LOG
@@ -51,7 +51,7 @@ function _debuglog(){
     fi 
 }
 
-function _welcome(){
+function _welcome {
 	clear
 	_debuglog
 	
@@ -111,16 +111,16 @@ _EOF_
 
 }
 
-function _die(){
+function _die {
 	echo "ERROR: $1"
 	exit 1
 }
 
-function _cexists () {
+function _cexists  {
     type "$1" &> /dev/null ;
 }
 
-function _requirements(){
+function _requirements {
 	echo "OPEW minimal requirements:"
 	echo " "
 	echo "* x64 based (64 bits) compatible processor"
@@ -133,7 +133,7 @@ function _requirements(){
 	read -p "Press enter to continue... "
 }
 
-function _testenv(){
+function _testenv {
 	echo " "
 	echo "Testing system requirements..."
 	echo " "
@@ -312,7 +312,7 @@ function _testenv(){
 # @return {integer} Partition freespace in MegaBytes @todo
 # @todo Improve validating partition of alternative manual path
 #
-function _checkspace(){
+function _checkspace {
 	# force to / if not path defined
 	if [ $# -eq 0 ]; then 
 		$1="/"
@@ -368,7 +368,7 @@ function _checkspace(){
 	echo " "
 }
 
-function _preinstall(){
+function _preinstall {
 	echo " "
 	echo "##############################################"
 	echo "Installation step - 1. Installation path "
@@ -403,7 +403,7 @@ function _preinstall(){
 	sleep 1
 }
 
-function _usersinstall(){
+function _usersinstall {
 	echo " "
 	echo "##############################################"
 	echo "Installation step - 3. OPEW users and groups"
@@ -520,7 +520,7 @@ function _usersinstall(){
 	fi 
 }
 
-function _license(){
+function _license {
 	echo " "
 	echo "##############################################"
 	echo "Installation step - 2. License agreement"
@@ -550,7 +550,7 @@ function _license(){
 	# TODO
 }
 
-function _doinstall(){
+function _doinstall {
 	echo " "
 	echo "##############################################"
 	echo "Installation step - 4. Install data." 
@@ -618,7 +618,7 @@ function _doinstall(){
 	sleep 2
 }
 
-function _postinstall(){
+function _postinstall {
 	echo " "
 	echo "############################################"
 	echo "Installation step - 4. Post-install process."

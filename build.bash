@@ -5,7 +5,7 @@
 #
 # @license	GNU GPL 3.0
 # @author	Tomas Aparicio <tomas@rijndael-project.com>
-# @version	2.3 beta - revision 03/06/2012
+# @version	1.0 beta - revision 05/06/2012
 # 
 # Copyright (C) 2012 - Tomas Aparicio
 #
@@ -80,6 +80,7 @@ PKGDIR="$LOCATION/pkg" # packages output directory
 INCDIR="$LOCATION/inc" # includes source directory
 LOGDIR="$LOCATION/log" # log output dir
 VERSION="1.0 Beta"
+DATE=`date +%d/%m/%Y`
 OUTPUT=installer.bash
 
 # check bash install folders
@@ -190,6 +191,24 @@ while : ; do
 done 
 
 echo " "
+echo "Script-Data separator string (e.g. ###DATA###) "
+echo "Note your installation script must support this string "
+while : ; do
+    read -p "Enter a separator (default ###DATA###): " res
+    if [ -z $res ] || [ ! -f "$res" ]; then
+        _FILE_SEPARATOR=$res
+        echo "Using '###DATA###' by default"
+        echo " "
+    else 
+        if [ $res == "exit" ]; then 
+            exit 0
+        fi
+        _FILE_SEPARATOR=$res
+        break
+    fi 
+done 
+
+echo " "
 echo "Software files folder (e.g. /opt/opew) "
 while : ; do
     read -p "Enter the software folder: " res
@@ -221,7 +240,7 @@ sleep 1
 
 echo " "
 echo "Generating the file package. This may take some minutes..."
-tar czvf "$TMPDIR/$_OUTPUT.tar.gz" $_FILE_FOLDER > "$LOGDIR/compress-files.log"
+tar czvf "$TMPDIR/$_OUTPUT.tar.gz" $_FILE_FOLDER > "$LOGDIR/$_NAME-compress-files.log"
 
 # takes the lines
 _LINES=`wc -l "$LOGDIR/compress-files.log" | awk '{ print $1; }'`
@@ -237,21 +256,20 @@ getfile $_FILE_HEADER >> "$TMPDIR/$OUTPUT"
 
 # set config variables
 echo '# config variables' >> "$TMPDIR/$OUTPUT"
-echo "VERSION='$_VERSION' # current OPEW version" >> "$TMPDIR/$OUTPUT"
-echo "LOG='$_NAME-install.log' # output log of the installer script" >> "$TMPDIR/$OUTPUT"
-echo "FILES='$_NAME-files.log' # output log of files" >> "$TMPDIR/$OUTPUT"
-echo "OUTPUT='/opt/' # default installation path" >> "$TMPDIR/$OUTPUT"
-echo "LINES=$_LINES # number of files" >> "$TMPDIR/$OUTPUT"
-echo "ERROR=0 # default with no errors" >> "$TMPDIR/$OUTPUT"
-
-# replace the config
-#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{LINES}/$_LINES/g" >> "$TMPDIR/$OUTPUT"
-#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{VERSION}/$_VERSION/g" >> "$TMPDIR/$OUTPUT"
-#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{NAME}/$_NAME/g" >> "$TMPDIR/$OUTPUT"
-#getfile "$TMPDIR/$OUTPUT" | sed -e "s/{NAME}/$_NAME/g" >> "$TMPDIR/$OUTPUT"
-
+echo '#'  >> "$TMPDIR/$OUTPUT"
+echo "# Generated the $DATE with OPEW Bash installer builder utility $VERSION"  >> "$TMPDIR/$OUTPUT"
+echo "# More info: https://github.com/h2non/OPEW-bash-installer"  >> "$TMPDIR/$OUTPUT"
+echo '#'  >> "$TMPDIR/$OUTPUT"
+echo "VERSION='$_VERSION'" >> "$TMPDIR/$OUTPUT"
+echo "LOG='$_NAME-install.log'" >> "$TMPDIR/$OUTPUT"
+echo "FILES='$_NAME-files.log'" >> "$TMPDIR/$OUTPUT"
+echo "OUTPUT='/opt/'" >> "$TMPDIR/$OUTPUT"
+echo "LINES=$_LINES" >> "$TMPDIR/$OUTPUT"
+echo "ERROR=0" >> "$TMPDIR/$OUTPUT"
 # get the installer
 getfile $_FILE_INSTALLER >> "$TMPDIR/$OUTPUT"
+# finally add the data separator string
+echo $_FILE_SEPARATOR >> "$TMPDIR/$OUTPUT"
 
 echo "Packing the installer ($_OUTPUT.bin)"
 # merge to .bin
